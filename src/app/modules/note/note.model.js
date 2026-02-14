@@ -1,0 +1,37 @@
+import mongoose from "mongoose";
+
+
+const noteSchema = new mongoose.Schema(
+    {
+        user: {
+            type: mongoose.Schema.Types.ObjectId,
+            ref: "User",
+            required: true,
+        },
+
+        title: {
+            type: String,
+            required: true,
+            trim: true,
+        },
+
+        content: {
+            type: String,
+            required: true,
+        },
+
+        tags: [
+            {
+                type: String,
+                trim: true,
+            },
+        ],
+    },
+    { timestamps: true }
+);
+
+
+// user listing their own notes with pagination
+noteSchema.index({ user: 1, createdAt: -1 });
+
+export const Note = mongoose.models.Note || mongoose.model("Note", noteSchema)

@@ -8,7 +8,7 @@
     "start": "node src/server.js",
     "prod": "NODE_ENV=production node src/server.js"
   },
-  "keywords": [ ],
+  "keywords": [],
   "author": "",
   "license": "ISC",
   "type": "module",
