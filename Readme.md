@@ -6,6 +6,8 @@ A RESTful API for managing users, posts, and notes with authentication and admin
 
 ```
 https://notes-backend-1-qb3v.onrender.com/api/v1
+Or,
+https://notes-backend-1-qb3v.onrender.com/
 ```
 ## Live Frontend URL
 
@@ -95,6 +97,8 @@ REFRESH_TOKEN_EXPIRE=7d
 
 ```
 https://notes-backend-1-qb3v.onrender.com/api/v1
+Or,
+https://notes-backend-1-qb3v.onrender.com/
 ```
 
 ### Endpoints Overview
