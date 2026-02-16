@@ -5,9 +5,13 @@ import { createPostService, deletePostService, getAllPostsService, getSinglePost
 
 export const createPost = asyncHandler( async ( req, res ) =>
 {
-    const { userId, payload } = req?.body;
+    console.log( req?.body )
+    
+    const { title, content } = req?.body;
+    const userId = req?.user?.id;
+  
 
-    const post = await createPostService( userId, payload );
+    const post = await createPostService( userId, title, content );
 
     return responseFunction( res, {
         message: "Post is created",
@@ -19,8 +23,9 @@ export const createPost = asyncHandler( async ( req, res ) =>
 
 export const getUserPosts = asyncHandler( async ( req, res ) =>
 {
-    const { userId } = req.params;
+    // const { userId } = req.params;
     const query = req.query;
+    const userId = req?.user?.id;
 
     const posts = await getUserPostsService( userId, query );
 
@@ -34,7 +39,8 @@ export const getUserPosts = asyncHandler( async ( req, res ) =>
 
 export const getSinglePost = asyncHandler( async ( req, res ) =>
 {
-    const { userId, postId } = req.params;
+    const { postId } = req.params;
+    const userId = req?.user?.id
 
     const post = await getSinglePostService( userId, postId );
 
@@ -45,7 +51,7 @@ export const getSinglePost = asyncHandler( async ( req, res ) =>
     } );
 } );
 
-// admin + public
+//public
 export const getAllPosts = asyncHandler( async ( req, res ) =>
 {
     const query = req.query;
@@ -61,8 +67,9 @@ export const getAllPosts = asyncHandler( async ( req, res ) =>
 
 export const updatePost = asyncHandler( async ( req, res ) =>
 {
-    const { userId, postId } = req.params;
+    const { postId } = req.params;
     const payload = req.body;
+    const userId = req?.user?.id
 
     const updatedPost = await updatePostService( userId, postId, payload );
 
@@ -75,7 +82,8 @@ export const updatePost = asyncHandler( async ( req, res ) =>
 
 export const deletePost = asyncHandler( async ( req, res ) =>
 {
-    const { userId, postId } = req.params;
+    const { postId } = req.params;
+    const userId = req?.user?.id
 
     const deletedPost = await deletePostService( userId, postId );
 

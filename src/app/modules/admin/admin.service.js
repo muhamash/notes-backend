@@ -1,10 +1,47 @@
 import bcrypt from "bcryptjs";
 import httpStatus from "http-status-codes";
 import { AppError } from "../../../config/errors/error.config.js";
-import { USER_ACTION } from "../../utils/enums/users.enum.js";
+import { USER_ACTION, USER_ROLES } from "../../utils/enums/users.enum.js";
 import { isValidObjectId } from "../../utils/service.util.js";
+import { Note } from "../note/note.model.js";
+import { Post } from "../post/post.model.js";
 import { User } from "../user/user.model.js";
 
+
+export const deleteUserService = async ( userId ) =>
+{
+    if ( !isValidObjectId( userId ) )
+    {
+        throw new AppError( httpStatus.BAD_REQUEST, "Invalid user ID" );
+    }
+
+    const findUser = await User.findById( userId );
+    if ( !findUser )
+    {
+        throw new AppError( httpStatus.NOT_FOUND, "User not found" );
+    }
+
+
+    if ( findUser.role === USER_ROLES.ADMIN )
+    {
+        throw new AppError( httpStatus.FORBIDDEN, "Admin modification not allowed" );
+    }
+
+  
+    await Promise.all( [
+        Post.deleteMany( { user: userId } ), 
+        Note.deleteMany( { user: userId } ), 
+    ] );
+
+    const deletedUser = await User.findByIdAndDelete( userId ).select( "-password" ).lean();
+
+    if ( !deletedUser )
+    {
+        throw new AppError( httpStatus.NOT_FOUND, "User already deleted" );
+    }
+
+    return deletedUser;
+};
 
 export const blockUserService = async ( userId, block = true ) =>
 {
@@ -17,6 +54,11 @@ export const blockUserService = async ( userId, block = true ) =>
     if ( !user )
     {
         throw new AppError( httpStatus.NOT_FOUND, "User not found" );
+    }
+
+    if ( user?.role === USER_ROLES.ADMIN )
+    {
+        throw new AppError( httpStatus.FORBIDDEN, "Admin modification not allowed" );
     }
 
     const newStatus = block ? USER_ACTION.BLOCKED : USER_ACTION.ACTIVE;
@@ -102,6 +144,13 @@ export const updateUserService = async ( userId, payload ) =>
         throw new AppError( httpStatus.BAD_REQUEST, "Update payload cannot be empty" );
     }
 
+    const findUser = await User.findById( userId );
+    
+    if ( findUser?.role === USER_ROLES.ADMIN )
+    {
+        throw new AppError( httpStatus.FORBIDDEN, "Admin modification not allowed" );
+    }
+
     if ( payload.password )
     {
         const salt = await bcrypt.genSalt( 10 );
@@ -120,21 +169,4 @@ export const updateUserService = async ( userId, payload ) =>
     }
 
     return updatedUser;
-};
-
-
-export const deleteUserService = async ( userId ) =>
-{
-    if ( !isValidObjectId( userId ) )
-    {
-        throw new AppError( httpStatus.BAD_REQUEST, "Invalid user ID" );
-    }
-
-    const deletedUser = await User.findByIdAndDelete( userId ).select( "-password" ).lean();
-    if ( !deletedUser )
-    {
-        throw new AppError( httpStatus.NOT_FOUND, "User not found or already deleted" );
-    }
-
-    return deletedUser;
 };

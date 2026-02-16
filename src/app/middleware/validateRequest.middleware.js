@@ -12,9 +12,11 @@ export const validateRequest = ( zodSchema ) => async (
             req.body = JSON.parse( req.body.data )
         }
 
+   
+        req.body = await zodSchema.parseAsync( req.body );
+        
         console.log( req.body );
         
-        req.body = await zodSchema.parseAsync( req.body );
         next();
     }
     catch ( error )

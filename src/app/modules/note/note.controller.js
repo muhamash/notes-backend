@@ -14,9 +14,11 @@ import
 
 export const createNote = asyncHandler( async ( req, res ) =>
 {
-    const { userId, payload } = req.body;
+    const { userId, content, title, tags } = req.body;
+    // const { userId } = req?.params;
+    console.log(userId, req?.user, content, title, tags)
 
-    const note = await createNoteService( userId, payload );
+    const note = await createNoteService( userId, content, title, tags );
 
     return responseFunction( res, {
         message: "Note created successfully",
@@ -57,7 +59,8 @@ export const getAllNotes = asyncHandler( async ( req, res ) =>
 
 export const getSingleNote = asyncHandler( async ( req, res ) =>
 {
-    const { userId, noteId } = req.params;
+    const { noteId } = req.params;
+    const userId = req?.user?.id;
 
     const note = await getSingleNoteService( userId, noteId );
 
@@ -71,8 +74,9 @@ export const getSingleNote = asyncHandler( async ( req, res ) =>
 
 export const updateNote = asyncHandler( async ( req, res ) =>
 {
-    const { userId, noteId } = req.params;
+    const { noteId } = req.params;
     const payload = req.body;
+    const userId = req?.user?.id;
 
     const updatedNote = await updateNoteService( userId, noteId, payload );
 
@@ -86,7 +90,8 @@ export const updateNote = asyncHandler( async ( req, res ) =>
 
 export const deleteNote = asyncHandler( async ( req, res ) =>
 {
-    const { userId, noteId } = req.params;
+    const { noteId } = req.params;
+    const userId = req?.user?.id;
 
     const deletedNote = await deleteNoteService( userId, noteId );
 

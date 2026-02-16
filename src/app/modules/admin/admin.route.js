@@ -13,19 +13,19 @@ import
 
 const router = Router();
 
+// connected to the frontend
+router.get( "/all-users", checkAuth, requireAdmin, getAllUsers );
 
-router.get( "/", checkAuth, requireAdmin, getAllUsers );
-
-
+// extra
 router.get("/:userId", checkAuth, requireAdmin, getUserById);
 
-
+// extra
 router.patch( "/:userId", checkAuth,requireAdmin, updateUser );
 
-
+// connected to the frontend
 router.delete( "/:userId", checkAuth,requireAdmin, deleteUser );
 
-
+// connected to the frontend
 router.patch("/:userId/block", checkAuth,requireAdmin, blockUser);
 
 

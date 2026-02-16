@@ -1,26 +1,31 @@
 import httpStatus from "http-status-codes";
+import mongoose from "mongoose";
 import { AppError } from "../../../config/errors/error.config.js";
 import { isValidObjectId } from "../../utils/service.util.js";
+import { User } from "../user/user.model.js";
 import { Note } from "./note.model.js";
 
 
-export const createNoteService = async ( userId, payload ) =>
+export const createNoteService = async ( userId, content, title, tags ) =>
 {
-    if ( !isValidObjectId( userId ) )
+    // console.log
+    if ( !userId || !isValidObjectId( userId ) )
     {
         throw new AppError(httpStatus.BAD_REQUEST, "Invalid user ID" );
     }
 
-    if ( !payload?.title?.trim() || !payload?.content?.trim() )
+    console.log(title, content)
+
+    if ( !title || !content )
     {
         throw new AppError( httpStatus.BAD_REQUEST, "Title and content are required" );
     }
 
     const note = await Note.create( {
         user: userId,
-        title: payload.title.trim(),
-        content: payload.content.trim(),
-        tags: payload.tags || [],
+        title: title.trim(),
+        content: content.trim(),
+        tags: tags || [],
     } );
 
     if ( !note )

@@ -16,6 +16,8 @@ export const getAllUsers = asyncHandler( async ( req, res ) =>
 
     const users = await getAllUsersService( query );
 
+    console.log( users )
+    
     return responseFunction( res, {
         message: "Users fetched successfully",
         statusCode: httpStatus.OK,
