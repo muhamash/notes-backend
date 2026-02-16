@@ -2,7 +2,7 @@
 
 A RESTful API for managing users, posts, and notes with authentication and admin capabilities.
 
-## 🚀 Live Backend URL
+##  Live Backend URL
 
 ```
 https://notes-backend-1-qb3v.onrender.com/api/v1
@@ -14,7 +14,7 @@ https://secure-web-note.vercel.app
 ```
 
 
-## ✨ Features
+## Features
 
 - User registration and authentication (JWT)
 - Post management (CRUD operations)
@@ -88,7 +88,6 @@ ACCESS_TOKEN_EXPIRE=5m
 REFRESH_TOKEN_EXPIRE=7d
 ```
 
-**Important**: Never commit your `.env` file to version control. Use strong, random strings for token secrets in production.
 
 ## 📚 API Documentation
 
