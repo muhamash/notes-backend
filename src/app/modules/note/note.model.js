@@ -31,7 +31,6 @@ const noteSchema = new mongoose.Schema(
 );
 
 
-// user listing their own notes with pagination
 noteSchema.index({ user: 1, createdAt: -1 });
 
 export const Note = mongoose.models.Note || mongoose.model("Note", noteSchema)

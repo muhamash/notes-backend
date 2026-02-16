@@ -3,7 +3,7 @@ export const asyncHandler = ( fn ) =>
     {
         return Promise.resolve( fn( req, res, next ) ).catch( ( error ) =>
         {
-            console.error( error, "async handler function" );
+            // console.error( error, "async handler function" );
             next( error );
         } );
 };
@@ -18,3 +18,8 @@ export const responseFunction = ( res, data) =>
         data: data.data
     } );
 };
+
+export const parsedDataFn = ( data ) =>
+{
+    return JSON.parse( JSON.stringify( data ) );
+}

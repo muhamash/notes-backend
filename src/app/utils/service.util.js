@@ -1,6 +1,7 @@
+import mongoose from "mongoose";
 import { ZodError } from "zod";
 
-export const isZodError = ( error ): error is { issues } =>
+export const isZodError = ( error ) =>
 {
     return error && typeof error === "object" && "issues" in error && Array.isArray(error.issues);
 };
@@ -26,4 +27,10 @@ export function parseZodError(error){
     }
 
     return issues;
+};
+
+
+export const isValidObjectId = ( id ) =>
+{
+    return mongoose.Types.ObjectId.isValid( id );
 };

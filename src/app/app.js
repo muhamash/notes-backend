@@ -3,15 +3,15 @@ import cors from "cors";
 import express from "express";
 import helmet from "helmet";
 import morgan from "morgan";
+import { globalErrorResponse } from './middleware/globalError.middleware.js';
 import { globalNotFoundResponse } from "./middleware/globalNotFound.middleware.js";
-import { rateLimitMiddleware } from './middleware/rateLimitingSliding.middleware.js';
 import { homeRouter } from './modules/home/home.route.js';
 import { servicesRouter } from "./routes/service.route.js";
 
 const app = express();
 
 // rate limiting 5 req per min
-app.use(rateLimitMiddleware);
+// app.use(rateLimitMiddleware);
 
 app.use( cookieParser() );
 app.use(express.json()); 
@@ -34,7 +34,7 @@ app.use( "/api/v1", servicesRouter );
 app.use( globalNotFoundResponse )
 
 // global error route
-app.use(globalNotFoundResponse)
+app.use(globalErrorResponse)
 
 
 export default app;

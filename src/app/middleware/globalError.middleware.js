@@ -1,6 +1,6 @@
 import httpStatus from "http-status-codes";
-import { AppError } from "../../config/errors/error.config";
-import { isZodError, parseZodError } from "../utils/service.util";
+import { AppError } from "../../config/errors/error.config.js";
+import { isZodError, parseZodError } from "../utils/service.util.js";
 
 export const globalErrorResponse = ( error, req, res, next ) =>
 {

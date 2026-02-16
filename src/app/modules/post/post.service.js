@@ -1,45 +1,52 @@
 import httpStatus from "http-status-codes";
 import { AppError } from "../../../config/errors/error.config";
 import { isValidObjectId } from "../../utils/service.util";
-import { Note } from "./note.model";
+import { Post } from "./post.model";
 
 
 
-export const createNoteService = async ( userId, payload ) =>
-{
-    if ( !isValidObjectId( userId ) )
-    {
-        throw new AppError(httpStatus.BAD_REQUEST, "Invalid user ID" );
-    }
-
-    if ( !payload?.title?.trim() || !payload?.content?.trim() )
-    {
-        throw new AppError( httpStatus.BAD_REQUEST, "Title and content are required" );
-    }
-
-    const note = await Note.create( {
-        user: userId,
-        title: payload.title.trim(),
-        content: payload.content.trim(),
-        tags: payload.tags || [],
-    } );
-
-    if ( !note )
-    {
-        throw new AppError( httpStatus.INTERNAL_SERVER_ERROR, "Unable to create a note!" );
-    }
-
-    return note;
-};
-
-
-export const getUserNotesService = async ( userId, query ) =>
+export const createPostService = async ( userId, payload ) =>
 {
     if ( !isValidObjectId( userId ) )
     {
         throw new AppError( httpStatus.BAD_REQUEST, "Invalid user ID" );
     }
 
+    if ( !payload?.title?.trim() || !payload?.content?.trim() )
+    {
+        throw new AppError(
+            httpStatus.BAD_REQUEST,
+            "Title and content are required"
+        );
+    }
+
+    const post = await Post.create( {
+        user: userId,
+        title: payload.title.trim(),
+        content: payload.content.trim(),
+        tags: payload.tags || [],
+    } );
+
+    if ( !post )
+    {
+        throw new AppError(
+            httpStatus.INTERNAL_SERVER_ERROR,
+            "Unable to create post"
+        );
+    }
+
+    return post;
+};
+
+
+export const getUserPostsService = async ( userId, query ) =>
+{
+    if ( !isValidObjectId( userId ) )
+    {
+        throw new AppError( httpStatus.BAD_REQUEST, "Invalid user ID" );
+    }
+
+    
     let page = Number( query.page ) || 1;
     let limit = Number( query.limit ) || 10;
 
@@ -55,7 +62,7 @@ export const getUserNotesService = async ( userId, query ) =>
         },
         {
             $lookup: {
-                from: "notes",
+                from: "posts",
                 let: { userId: "$_id" },
                 pipeline: [
                     { $match: { $expr: { $eq: [ "$user", "$$userId" ] } } },
@@ -64,7 +71,7 @@ export const getUserNotesService = async ( userId, query ) =>
                     { $limit: limit },
                     { $project: { __v: 0 } },
                 ],
-                as: "notes",
+                as: "posts",
             },
         },
         {
@@ -80,23 +87,45 @@ export const getUserNotesService = async ( userId, query ) =>
         throw new AppError( httpStatus.NOT_FOUND, "User not found" );
     }
 
-    const totalNotes = await Note.countDocuments( { user: userId } );
+    
+    const totalPosts = await Post.countDocuments( { user: userId } );
 
     return {
         ...result[ 0 ],
-        notesMeta: {
-            total: totalNotes,
+        meta: {
+            total: totalPosts,
             page,
             limit,
-            totalPages: Math.ceil( totalNotes / limit ),
-            hasNextPage: page * limit < totalNotes,
+            totalPages: Math.ceil( totalPosts / limit ),
+            hasNextPage: page * limit < totalPosts,
             hasPrevPage: page > 1,
         },
     };
 };
 
 
-export const getAllNotesService = async ( query ) =>
+export const getSinglePostService = async ( userId, postId ) =>
+{
+    if ( !isValidObjectId( userId ) || !isValidObjectId( postId ) )
+    {
+        throw new AppError( httpStatus.BAD_REQUEST, "Invalid ID" );
+    }
+
+    const post = await Post.findOne( {
+        _id: postId,
+        user: userId,
+    } ).lean();
+
+    if ( !post )
+    {
+        throw new AppError( httpStatus.NOT_FOUND, "Post not found" );
+    }
+
+    return post;
+};
+
+
+export const getAllPostsService = async ( query ) =>
 {
     let page = Number( query.page ) || 1;
     let limit = Number( query.limit ) || 10;
@@ -107,7 +136,7 @@ export const getAllNotesService = async ( query ) =>
 
     const skip = ( page - 1 ) * limit;
 
-    const total = await Note.countDocuments( {} );
+    const total = await Post.countDocuments( {} );
 
     if ( total === 0 )
     {
@@ -124,19 +153,18 @@ export const getAllNotesService = async ( query ) =>
         };
     }
 
-  
-    const notes = await Note.find( {} )
-        .sort( { createdAt: -1 } ) 
+    const posts = await Post.find( {} )
+        .sort( { createdAt: -1 } )
         .skip( skip )
         .limit( limit )
         .populate( {
             path: "user",
-            select: "name email", 
+            select: "name email",
         } )
         .lean();
 
     return {
-        data: notes,
+        data: posts,
         meta: {
             total,
             page,
@@ -149,47 +177,29 @@ export const getAllNotesService = async ( query ) =>
 };
 
 
-export const getSingleNoteService = async ( userId, noteId ) =>
+export const updatePostService = async ( userId, postId, payload ) =>
 {
-    if ( !isValidObjectId( userId ) || !isValidObjectId( noteId ) )
+    if ( !isValidObjectId( userId ) || !isValidObjectId( postId ) )
     {
-        throw new AppError(httpStatus.BAD_REQUEST, "Invalid ID" );
-    }
-
-    const note = await Note.findOne( {
-        _id: noteId,
-        user: userId,
-    } ).lean();
-
-    if ( !note )
-    {
-        throw new AppError(httpStatus.NOT_FOUND, "Note not found" );
-    }
-
-    return note;
-};
-
-
-export const updateNoteService = async ( userId, noteId, payload ) =>
-{
-    if ( !isValidObjectId( userId ) || !isValidObjectId( noteId ) )
-    {
-        throw new AppError(httpStatus.BAD_REQUEST, "Id is not valid")
+        throw new AppError( httpStatus.BAD_REQUEST, "Invalid ID" );
     }
 
     if ( !payload || Object.keys( payload ).length === 0 )
     {
-        throw new AppError(httpStatus.BAD_REQUEST, "Update payload cannot be empty" );
+        throw new AppError(
+            httpStatus.BAD_REQUEST,
+            "Update payload cannot be empty"
+        );
     }
 
-    const note = await Note.findOne( {
-        _id: noteId,
+    const existingPost = await Post.findOne( {
+        _id: postId,
         user: userId,
     } ).lean();
 
-    if ( !note )
+    if ( !existingPost )
     {
-        throw new AppError(httpStatus.NOT_FOUND, "Note not found" );
+        throw new AppError( httpStatus.NOT_FOUND, "Post not found" );
     }
 
     const updateData = {};
@@ -198,47 +208,53 @@ export const updateNoteService = async ( userId, noteId, payload ) =>
     if ( payload.content ) updateData.content = payload.content.trim();
     if ( payload.tags ) updateData.tags = payload.tags;
 
-    const updatedNote = await Note.findOneAndUpdate(
-        { _id: noteId, user: userId },
+    const updatedPost = await Post.findOneAndUpdate(
+        { _id: postId, user: userId },
         updateData,
         { new: true }
     ).lean();
 
-    if ( !updatedNote )
+    if ( !updatedPost )
     {
-        throw new AppError(httpStatus.INTERNAL_SERVER_ERROR, "Error while updating note" );
+        throw new AppError(
+            httpStatus.INTERNAL_SERVER_ERROR,
+            "Error while updating post"
+        );
     }
 
-    return updatedNote;
+    return updatedPost;
 };
 
 
-export const deleteNoteService = async ( userId, noteId ) =>
+export const deletePostService = async ( userId, postId ) =>
 {
-    if ( !isValidObjectId( userId ) || !isValidObjectId( noteId ) )
+    if ( !isValidObjectId( userId ) || !isValidObjectId( postId ) )
     {
-        throw new Error( "Invalid ID" );
+        throw new AppError( httpStatus.BAD_REQUEST, "Invalid ID" );
     }
 
-    const note = await Note.findOne( {
-        _id: noteId,
+    const post = await Post.findOne( {
+        _id: postId,
         user: userId,
     } ).lean();
 
-    if ( !note )
+    if ( !post )
     {
-        throw new AppError(httpStatus.NOT_FOUND, "Note not found" );
+        throw new AppError( httpStatus.NOT_FOUND, "Post not found" );
     }
 
-    const deletedNote = await Note.findOneAndDelete( {
-        _id: noteId,
+    const deletedPost = await Post.findOneAndDelete( {
+        _id: postId,
         user: userId,
     } ).lean();
 
-    if ( !note )
+    if ( !deletedPost )
     {
-        throw new AppError(404, "Note not found")
+        throw new AppError(
+            httpStatus.INTERNAL_SERVER_ERROR,
+            "Error while deleting post"
+        );
     }
 
-    return deletedNote;
+    return deletedPost;
 };
