@@ -71,7 +71,6 @@ export const getAllUsersService = async ( query ) =>
     };
 };
 
-
  
 export const getUserByIdService = async ( userId ) =>
 {

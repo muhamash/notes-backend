@@ -1,7 +1,7 @@
 import httpStatus from "http-status-codes";
 import { AppError } from "../../../config/errors/error.config.js";
 import { asyncHandler, responseFunction } from "../../utils/controller.util.js";
-import { createUserService, loginService } from "./user.service.js";
+import { createUserService, getGroupedByUsersAndInterestsService, loginService } from "./user.service.js";
 
 export const login = asyncHandler( async ( req, res ) =>
 {
@@ -38,11 +38,23 @@ export const registerUser = asyncHandler( async ( req, res ) =>
         return;
     }
 
-    console.log(newUser)
+    console.log( newUser )
 
     responseFunction( res, {
         message: `User created!!`,
         statusCode: httpStatus.CREATED,
         data: newUser,
     } );
+} );
+
+export const getGroupByUsersInterests = asyncHandler( async ( req, res ) =>
+{
+    const data = await getGroupedByUsersAndInterestsService();
+
+
+    return responseFunction( res, {
+        message: "Users group by interest oka",
+        statusCode: httpStatus.OK,
+        data: data
+    })
 })

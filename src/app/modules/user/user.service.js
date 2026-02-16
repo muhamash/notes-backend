@@ -49,3 +49,56 @@ export const createUserService = async (payload) =>
 
     return parsedDataFn(userObj)
 }
+
+export const getGroupedByUsersAndInterestsService = async () =>
+{
+    const result = await User.aggregate( [
+        {
+            $match: {
+                userAction: { $ne: "BLOCKED" }
+            }
+        },
+        
+        {
+            $unwind: "$interests"
+        },
+        {
+            $group: {
+                _id: "$interests",
+                users: {
+                    $push: {
+                        _id: "$_id",
+                        name: "$name",
+                        email: "$email",
+                        role: "$role",
+                        userAction: "$userAction",
+                        createdAt: "$createdAt"
+                    }
+                },
+                totalUsers: { $sum: 1 }
+            }
+        },
+
+        
+        {
+            $sort: { _id: 1 }
+        },
+
+        
+        {
+            $project: {
+                _id: 0,
+                interest: "$_id",
+                totalUsers: 1,
+                users: 1
+            }
+        }
+    ] );
+
+    if ( !result || result.length === 0 )
+    {
+        throw new AppError( httpStatus.NOT_FOUND, "No interests found" );
+    }
+
+    return parsedDataFn(result);
+};
