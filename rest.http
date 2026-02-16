@@ -7,3 +7,7 @@
 
 GET http://localhost:5000/api/v1/user/get-users-interests
 Content-Type: application/json
+
+
+# GET https://notes-backend-1-qb3v.onrender.com/api/v1/user/get-users-interests
+# Content-Type: application/json
