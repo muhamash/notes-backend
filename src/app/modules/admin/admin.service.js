@@ -1,9 +1,9 @@
 import bcrypt from "bcryptjs";
 import httpStatus from "http-status-codes";
-import { AppError } from "../../../config/errors/error.config";
+import { AppError } from "../../../config/errors/error.config.js";
 import { USER_ACTION } from "../../utils/enums/users.enum.js";
-import { isValidObjectId } from "../../utils/service.util";
-import { User } from "../user/user.model";
+import { isValidObjectId } from "../../utils/service.util.js";
+import { User } from "../user/user.model.js";
 
 
 export const blockUserService = async ( userId, block = true ) =>

@@ -58,7 +58,6 @@ export const getGroupedByUsersAndInterestsService = async () =>
                 userAction: { $ne: "BLOCKED" }
             }
         },
-        
         {
             $unwind: "$interests"
         },
@@ -71,19 +70,17 @@ export const getGroupedByUsersAndInterestsService = async () =>
                         name: "$name",
                         email: "$email",
                         role: "$role",
-                        userAction: "$userAction",
+                        // userAction: "$userAction",
                         createdAt: "$createdAt"
                     }
                 },
                 totalUsers: { $sum: 1 }
             }
         },
-
         
         {
             $sort: { _id: 1 }
         },
-
         
         {
             $project: {

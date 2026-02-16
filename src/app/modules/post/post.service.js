@@ -1,7 +1,8 @@
 import httpStatus from "http-status-codes";
-import { AppError } from "../../../config/errors/error.config";
-import { isValidObjectId } from "../../utils/service.util";
-import { Post } from "./post.model";
+import { AppError } from "../../../config/errors/error.config.js";
+import { parsedDataFn } from "../../utils/controller.util.js";
+import { isValidObjectId } from "../../utils/service.util.js";
+import { Post } from "./post.model.js";
 
 
 
@@ -35,7 +36,7 @@ export const createPostService = async ( userId, payload ) =>
         );
     }
 
-    return post;
+    return parsedDataFn(post);
 };
 
 

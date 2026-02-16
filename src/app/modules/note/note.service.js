@@ -1,8 +1,7 @@
 import httpStatus from "http-status-codes";
-import { AppError } from "../../../config/errors/error.config";
-import { isValidObjectId } from "../../utils/service.util";
-import { Note } from "./note.model";
-
+import { AppError } from "../../../config/errors/error.config.js";
+import { isValidObjectId } from "../../utils/service.util.js";
+import { Note } from "./note.model.js";
 
 
 export const createNoteService = async ( userId, payload ) =>

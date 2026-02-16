@@ -1,7 +1,7 @@
 import httpStatus from "http-status-codes";
-import jwt, { JwtPayload } from "jsonwebtoken";
-import { envStrings } from "../../config/env.config";
-import { AppError } from "../../config/errors/App.error";
+import jwt from "jsonwebtoken";
+import { envStrings } from "../../config/env.config.js";
+import { AppError } from "../../config/errors/error.config.js";
 
 
 export const checkAuth = async (
@@ -34,7 +34,8 @@ export const checkAuth = async (
         req.user = decoded;
 
         next();
-    } catch ( error )
+    }
+    catch ( error )
     {
         if ( error instanceof jwt.TokenExpiredError )
         {
